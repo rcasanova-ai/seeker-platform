@@ -1,0 +1,24 @@
+{
+  "name": "seeker-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable shared integration platform for products on Solana Seeker.",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "integrations/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "test": "vitest run",
+    "typecheck": "tsc -b --pretty false",
+    "lint:secrets": "node scripts/check-no-secrets.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

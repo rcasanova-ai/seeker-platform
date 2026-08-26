@@ -1,0 +1,14 @@
+{
+  "name": "@seeker-platform/example-x402-paid-api",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@seeker-platform/x402-client": "0.1.0"
+  }
+}

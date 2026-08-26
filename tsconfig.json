@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/seeker-wallet" },
+    { "path": "./packages/seeker-identity" },
+    { "path": "./packages/payment-policy" },
+    { "path": "./packages/approval-ui" },
+    { "path": "./packages/transaction-audit" },
+    { "path": "./packages/x402-client" },
+    { "path": "./packages/mobile-session" },
+    { "path": "./integrations/santati-phyll" },
+    { "path": "./integrations/toasty-studio" },
+    { "path": "./examples/x402-paid-api" },
+    { "path": "./examples/human-approval-flow" }
+  ]
+}

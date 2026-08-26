@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    { "path": "../../packages/approval-ui" },
+    { "path": "../../packages/payment-policy" },
+    { "path": "../../packages/seeker-wallet" },
+    { "path": "../../packages/transaction-audit" },
+    { "path": "../../packages/x402-client" }
+  ]
+}
