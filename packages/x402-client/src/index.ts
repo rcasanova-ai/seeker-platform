@@ -1,6 +1,6 @@
 import type { HumanApprovalProvider } from "@seeker-platform/approval-ui";
 import type { PaymentPolicyEngine, PolicyDecision } from "@seeker-platform/payment-policy";
-import type { SeekerWallet } from "@seeker-platform/seeker-wallet";
+import type { PaymentInstruction, SeekerWallet, SignedPayment } from "@seeker-platform/seeker-wallet";
 import type { TransactionAuditSink } from "@seeker-platform/transaction-audit";
 
 export interface X402PaymentRequirement {
@@ -12,6 +12,10 @@ export interface X402PaymentRequirement {
   paymentUrl?: string;
 }
 
+export interface PaymentExecutor {
+  execute(instruction: PaymentInstruction, wallet: SeekerWallet): Promise<SignedPayment>;
+}
+
 export interface X402ClientOptions {
   requestingApplication: string;
   requestingActor: string;
@@ -19,6 +23,7 @@ export interface X402ClientOptions {
   wallet: SeekerWallet;
   auditSink: TransactionAuditSink;
   approvalProvider?: HumanApprovalProvider;
+  paymentExecutor?: PaymentExecutor;
   taskSpendSoFar?: number;
   dailySpendSoFar?: number;
 }
@@ -39,7 +44,9 @@ export class X402Client {
       return initial;
     }
 
-    const requirement = await parsePaymentRequirement(initial);
+    const requirement = await parsePaymentRequirement(initial).catch((error) => {
+      throw new X402ClientError("Malformed x402 payment requirement.", "MALFORMED_PAYMENT_REQUIREMENT", error);
+    });
     const decision = this.options.policyEngine.evaluate({
       provider: requirement.provider,
       asset: requirement.asset,
@@ -52,16 +59,10 @@ export class X402Client {
     const approval = await this.resolveApproval(requirement, decision);
     if (!approval.approved) {
       await this.record(requirement, decision, approval.approvedAmount, "denied", "denied");
-      throw new Error(`Payment denied: ${decision.reason}`);
+      throw new X402ClientError(`Payment denied: ${decision.reason}`, "PAYMENT_DENIED");
     }
 
-    const payment = await this.options.wallet.pay({
-      provider: requirement.provider,
-      recipient: requirement.recipient,
-      amount: approval.approvedAmount,
-      asset: requirement.asset,
-      purpose: requirement.purpose
-    });
+    const payment = await this.executePayment(requirement, approval.approvedAmount, approval.source);
 
     const retry = await this.fetchImpl(input, {
       ...init,
@@ -83,6 +84,37 @@ export class X402Client {
     );
 
     return retry;
+  }
+
+  private async executePayment(
+    requirement: X402PaymentRequirement,
+    approvedAmount: number,
+    approvalSource: "policy" | "human" | "denied"
+  ): Promise<SignedPayment> {
+    try {
+      await this.options.wallet.connect();
+      const instruction = {
+        provider: requirement.provider,
+        recipient: requirement.recipient,
+        amount: approvedAmount,
+        asset: requirement.asset,
+        purpose: requirement.purpose,
+        reference: requirement.paymentUrl
+      };
+
+      return await (this.options.paymentExecutor
+        ? this.options.paymentExecutor.execute(instruction, this.options.wallet)
+        : this.options.wallet.pay(instruction));
+    } catch (error) {
+      await this.record(
+        requirement,
+        { status: "approved", approvedAmount, reason: "Payment execution failed after approval." },
+        approvedAmount,
+        approvalSource,
+        "failed"
+      );
+      throw new X402ClientError("Payment execution failed.", "PAYMENT_EXECUTION_FAILED", error);
+    }
   }
 
   private async resolveApproval(requirement: X402PaymentRequirement, decision: PolicyDecision) {
@@ -146,6 +178,20 @@ export function paymentRequiredResponse(requirement: X402PaymentRequirement): Re
       "x402-payment-required": "true"
     }
   });
+}
+
+export class X402ClientError extends Error {
+  constructor(
+    message: string,
+    readonly code:
+      | "MALFORMED_PAYMENT_REQUIREMENT"
+      | "PAYMENT_DENIED"
+      | "PAYMENT_EXECUTION_FAILED",
+    readonly cause?: unknown
+  ) {
+    super(message);
+    this.name = "X402ClientError";
+  }
 }
 
 async function parsePaymentRequirement(response: Response): Promise<X402PaymentRequirement> {

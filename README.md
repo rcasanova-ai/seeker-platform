@@ -23,6 +23,7 @@ The platform is organized as an npm TypeScript monorepo:
 
 - `packages/*` contains reusable platform packages.
 - `integrations/*` contains deliberately thin product integration scaffolds.
+- `apps/*` contains reusable app foundations such as the Seeker mobile shell.
 - `examples/*` contains runnable mocked flows.
 - `docs/*` explains the architecture, security model, x402 flow, and wallet signing model.
 
@@ -35,6 +36,7 @@ The platform is organized as an npm TypeScript monorepo:
 - `@seeker-platform/transaction-audit`: immutable-style audit event contracts and in-memory append-only store.
 - `@seeker-platform/approval-ui`: contracts for explicit human approval.
 - `@seeker-platform/mobile-session`: shared mobile session primitives.
+- `@seeker-platform/seeker-mobile-shell`: portable state and registry foundation for a future Expo/React Native Seeker app.
 
 ## Consumers, Not Owners
 
@@ -45,10 +47,13 @@ Santati and Toasty Studio are consumers of this platform. Santati Phyll uses the
 Implemented:
 
 - TypeScript workspace scaffolding.
-- Shared interfaces and initial in-memory/mock implementations.
+- Wallet discovery, connection state, public key, signing/submission interfaces, capability detection, and explicit wallet errors.
+- x402 client handling of malformed 402s, policy denial, approval escalation, payment failure, retry, and audit generation.
 - Mock x402 paid API example.
 - Human approval flow example.
 - Thin Santati Phyll and Toasty Studio integration scaffolds.
+- Seeker mobile shell state/registry foundation.
+- Seeker engagement integration scaffold.
 
 Mocked:
 
@@ -59,6 +64,13 @@ Mocked:
 - Real Santati production integration.
 - Real Toasty production integration.
 
+Requires physical Seeker or compatible Android validation:
+
+- Real Mobile Wallet Adapter authorization.
+- Seed Vault-backed signing.
+- Android deep-link behavior.
+- Wallet discovery against installed mobile wallets.
+
 ## Development Roadmap
 
 1. Replace mock wallet adapter with Solana Mobile Wallet Adapter integration.
@@ -67,6 +79,18 @@ Mocked:
 4. Add Seeker-native human approval UI.
 5. Add integration tests against sandbox payment providers.
 6. Add product-specific adapters in consumer repositories, not here.
+
+## Development Setup
+
+```bash
+npm install
+npm run typecheck
+npm test
+npm run build
+npm run lint:secrets
+```
+
+The current mobile shell is portable TypeScript. A future native shell should use the current Solana Mobile recommended React Native/Expo path and provide the `MobileWalletAdapterRuntime` implementation.
 
 ## Security Principles
 

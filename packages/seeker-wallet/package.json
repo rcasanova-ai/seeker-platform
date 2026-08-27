@@ -7,5 +7,21 @@
   "scripts": {
     "build": "tsc -b",
     "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@solana-mobile/mobile-wallet-adapter-protocol": "^2.2.1",
+    "@solana-mobile/mobile-wallet-adapter-protocol-kit": "^0.4.0",
+    "@solana/kit": "^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@solana-mobile/mobile-wallet-adapter-protocol": {
+      "optional": true
+    },
+    "@solana-mobile/mobile-wallet-adapter-protocol-kit": {
+      "optional": true
+    },
+    "@solana/kit": {
+      "optional": true
+    }
   }
 }

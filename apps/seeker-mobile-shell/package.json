@@ -1,0 +1,17 @@
+{
+  "name": "@seeker-platform/seeker-mobile-shell",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@seeker-platform/approval-ui": "0.1.0",
+    "@seeker-platform/mobile-session": "0.1.0",
+    "@seeker-platform/seeker-identity": "0.1.0",
+    "@seeker-platform/seeker-wallet": "0.1.0",
+    "@seeker-platform/transaction-audit": "0.1.0"
+  }
+}

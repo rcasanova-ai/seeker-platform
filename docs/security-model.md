@@ -13,4 +13,8 @@ This repository does not store private keys, seed phrases, or wallet secrets.
 
 ## Current Status
 
-The current implementation uses mock wallet and provider flows for development. It is not production-ready for real money.
+The current implementation uses mock wallet and provider flows for automated tests. It is not production-ready for real money.
+
+## Hardware Boundary
+
+Seeker/Seed Vault signing must be validated on physical Seeker hardware or compatible Android wallet tooling. The application receives public keys and signatures, not private keys.

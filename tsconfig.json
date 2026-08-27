@@ -8,7 +8,9 @@
     { "path": "./packages/transaction-audit" },
     { "path": "./packages/x402-client" },
     { "path": "./packages/mobile-session" },
+    { "path": "./apps/seeker-mobile-shell" },
     { "path": "./integrations/santati-phyll" },
+    { "path": "./integrations/seeker-engagement" },
     { "path": "./integrations/toasty-studio" },
     { "path": "./examples/x402-paid-api" },
     { "path": "./examples/human-approval-flow" }
